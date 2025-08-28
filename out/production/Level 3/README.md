@@ -1,96 +1,53 @@
-# 💬 Realtime Chat (Task 1)
+## Concurrent Bank (Task 2)
 
-A **simple TCP-based multi-user chat application** in Java with a server and a console client.
-Perfect for learning socket programming, threading, and command-based communication. 🚀
+A small Java program demonstrating race conditions and thread-safety strategies using a simple bank account.
 
----
+### What it shows
+- Unsynchronized access causes data races and incorrect balances
+- `synchronized` methods ensure mutual exclusion
+- `ReentrantLock` provides explicit locking with try/finally patterns
 
-## ✨ Features
+### Files
+- `ConcurrentBank.java` — runs three simulations against different `BankAccount` implementations:
+  - `UnsynchronizedBankAccount`
+  - `SynchronizedBankAccount`
+  - `LockedBankAccount` (uses `ReentrantLock`)
 
-* 👥 **Auto-assigned nickname** on join (`User1`, `User2`, …)
-* 📝 **Chat commands**: `/list`, `/name <new>`, `/w <user> <msg>`, `/quit`
-* 🔒 **Private messaging** via `/w`
-* 📢 **System notices** for join, leave, and rename events
-* ⚡ **Low-latency messaging** with TCP\_NODELAY enabled
+Each simulation submits 100 tasks to a fixed thread pool of 10 workers. Every task performs:
+- `deposit(100)` then `withdraw(50)`
 
----
+Expected net change per task = 50; across 100 tasks → expected final balance = 5000.
 
-## ⚙️ Requirements
+### Requirements
+- Java 8+ (JDK) on your PATH
 
-* Java **8+ (JDK)** installed and available on your `PATH`
-
----
-
-## 🏗️ Compile
-
-From the project directory, run:
-
+### Compile
+From this directory:
 ```bash
-javac ChatServer.java ChatClient.java
+javac ConcurrentBank.java
 ```
 
----
-
-## 🚀 Run the Server
-
-* Default port → **5555**
-
+### Run
 ```bash
-java ChatServer           # starts on port 5555
-java ChatServer 6000      # starts on custom port (6000)
+java ConcurrentBank
 ```
 
----
+You will see three sections run in order:
+1) Unsynchronized
+2) Synchronized
+3) ReentrantLock
 
-## 💻 Run the Client
+Each section prints:
+- `Final Balance: <number>`
+- `Expected Balance: 5000`
 
-**Usage**:
+### Interpreting results
+- Unsynchronized: Final balance will often be incorrect (less than 5000) due to race conditions
+- Synchronized: Final balance should be 5000
+- ReentrantLock: Final balance should be 5000
 
-```bash
-java ChatClient <host> <port> [nickname]
-```
+### Notes
+- The short `Thread.sleep(5)` calls amplify timing windows to make races more likely in the unsynchronized case.
+- `ExecutorService` is used to run tasks concurrently; the program awaits termination before reporting the final balance.
 
-**Examples**:
 
-```bash
-java ChatClient 127.0.0.1 5555          # connect with auto nickname
-java ChatClient 127.0.0.1 5555 Alice    # request nickname "Alice"
-```
-
----
-
-## ⌨️ In-Chat Commands
-
-* `/list` → Show online users
-* `/name <new>` → Change nickname (e.g., `/name Alice_2`)
-* `/w <user> <msg>` → Private message (e.g., `/w Bob hello!`)
-* `/quit` → Disconnect from chat
-
----
-
-## 🔮 Example Session (Local)
-
-```bash
-# 1. Start the server
-java ChatServer
-
-# 2. Connect client A
-java ChatClient 127.0.0.1 5555 Alice
-
-# 3. Connect client B
-java ChatClient 127.0.0.1 5555 Bob
-
-# 4. Bob types:
-Hi everyone!
-
-# 5. Alice types:
-/w Bob Hey Bob!
-```
-
----
-
-## 📝 Notes
-
-* ✅ Nickname rules: 1–20 characters (`letters/numbers/underscore`)
-* 🚫 If requested nickname is **taken** or **invalid**, the server keeps your current name
-* 🧵 Each client runs on its own handler thread
