@@ -54,16 +54,6 @@ cd "Level 3/Task 3"
 java Main
 ```
 
----
-
-## 📸 Result
-
-Here’s how the calculator looks:
-
-![Modern Calculator Screenshot](Screenshot%202025-08-28%20181619.png)
-
----
-
 ## 📝 Notes
 
 * Built entirely with **Java Swing**
@@ -73,7 +63,3 @@ Here’s how the calculator looks:
 ---
 
 💡 *Perfect for practicing Swing UI development while creating a functional desktop utility!*
-
-```
-
----
